@@ -25,13 +25,18 @@ class WorkThread(QThread):
         result = baidu.translate('\n'.join(self.__input_mesaage[(index-1)*50:]))
         self.update_single.emit('\n'.join(result))
     
-    def xunfeiTranslate(self):
+    def xunfeiEnglishToChineseTranslate(self):
         for item in self.__input_mesaage:
-            result = xunfei.translate(item)
+            result = xunfei.englishTranslate(item)
+            self.update_single.emit(result)
+            
+    def xunfeiChineseToEnglishTranslate(self):
+        for item in self.__input_mesaage:
+            result = xunfei.chineseTranslate(item)
             self.update_single.emit(result)
         
     def translate(self):
-        switch = {u'baidu': self.baiduTranslate, u'xunfei': self.xunfeiTranslate}
+        switch = {u'baidu': self.baiduTranslate, u'xunfei_chinese_to_english': self.xunfeiChineseToEnglishTranslate, u'xunfei_english_to_chinese': self.xunfeiEnglishToChineseTranslate}
         translate = switch[self.__way]
         translate()
     def run(self, *args, **kwargs):

@@ -9,6 +9,7 @@ from PyQt4.QtGui import QFileDialog, QTextCursor, QMessageBox
 from ui.translate_ui import Ui_MainWindow
 from MyThread import translateThread
 import sys
+import chardet
  
 class MyApp(QtGui.QMainWindow, Ui_MainWindow):
     def __init__(self):
@@ -25,9 +26,12 @@ class MyApp(QtGui.QMainWindow, Ui_MainWindow):
         self.input_text_browser.setPlainText("")
         self.output_text_browser.setPlainText("")
         file_name = QFileDialog.getOpenFileName(parent=None)
+        f = open(file_name,'r')
+        fencoding=chardet.detect(f.read())
+        encode = fencoding['encoding']
         with open(file_name) as fp:
             for line in fp:
-                self.updateInputBroswer(line)
+                self.updateInputBroswer(line.decode(encode))
     
     def updateInputBroswer(self, line):
         self.input_text_browser.moveCursor(QTextCursor.End)
@@ -38,7 +42,7 @@ class MyApp(QtGui.QMainWindow, Ui_MainWindow):
         self.output_text_browser.textCursor().insertText(line)
     
     def startTranslate(self):
-        way = {u'百度':'baidu', u'讯飞': 'xunfei'}
+        way = {u'百度':'baidu', u'讯飞英翻中': 'xunfei_english_to_chinese', u'讯飞中翻英': 'xunfei_chinese_to_english'}
         text = unicode(self.translate_way_combobox.currentText())
         message = unicode(self.input_text_browser.toPlainText()).split('\n')
         self.translate_thread = translateThread.WorkThread(message,way[text])
